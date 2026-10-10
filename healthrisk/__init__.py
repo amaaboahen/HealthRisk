@@ -1,0 +1,1 @@
+"""Educational synthetic healthcare analytics."""
