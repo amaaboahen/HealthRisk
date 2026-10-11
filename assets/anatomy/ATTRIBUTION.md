@@ -20,7 +20,7 @@ Kousaku Okubo.
   https://creativecommons.org/licenses/by-sa/2.1/jp/
 - Original database: https://dbarchive.biosciencedbc.jp/en/bodyparts3d/
 - Full upstream statements are retained in `UPSTREAM-LICENSE.txt` and
-  `UPSTREAM-README.md`, including references not exported here.
+  `UPSTREAM-README.md`, including references not exported here (trailing whitespace normalized; notice text preserved).
 
 ## Kidney reference restriction
 

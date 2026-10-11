@@ -1,39 +1,39 @@
 # Z-Anatomy
-This repository contains the Blender template of the Z-Anatomy Project.  
-It includes models derived from 'BodyParts3D' and definitions that heavily rely on Wikipedia.  
-It was made by Gauthier Kervyn (design, 3D, anatomy) and Marcin Zielinski (Python script).  
+This repository contains the Blender template of the Z-Anatomy Project.
+It includes models derived from 'BodyParts3D' and definitions that heavily rely on Wikipedia.
+It was made by Gauthier Kervyn (design, 3D, anatomy) and Marcin Zielinski (Python script).
 This version is meant to be used as a navigable atlas within Blender.
 It is a template and requires the following installation to work properly.
 
 [![Z-Anatomy video](https://img.youtube.com/vi/NNNUPDoFMYw/0.jpg)](https://www.youtube.com/watch?v=NNNUPDoFMYw)
 
-## INSTALLATION  
-    
-1: Download and install Blender (https://www.blender.org/)  
-2: Download 'Z-Anatomy_Template.zip'  
-3: Unzip it (but keep 'Z-Anatomy.zip' as it is)  
-4: Open Blender  
-5: Click on the Blender-icon in the upper-left corner of the window  
-6: Choose 'Install Application Template' and select the 'Z-Anatomy.zip' file on your computer  
+## INSTALLATION
+
+1: Download and install Blender (https://www.blender.org/)
+2: Download 'Z-Anatomy_Template.zip'
+3: Unzip it (but keep 'Z-Anatomy.zip' as it is)
+4: Open Blender
+5: Click on the Blender-icon in the upper-left corner of the window
+6: Choose 'Install Application Template' and select the 'Z-Anatomy.zip' file on your computer
 7: File>New>Z-Anatomy
 
 
-**SHORTCUT WITH ICON**  
+**SHORTCUT WITH ICON**
 
-In order to add the icon to the shortcut on your desktop:  
-1) Go to C/Programs/Blender Foundation/Blender 3.1 (/3.2/...)  
-2) RMB on 'Blender.exe'>Create shortcut (on desktop)  
-3) On the desktop, RMB on the icon>Rename  
-    Type 'Z-Anatomy'  
+In order to add the icon to the shortcut on your desktop:
+1) Go to C/Programs/Blender Foundation/Blender 3.1 (/3.2/...)
+2) RMB on 'Blender.exe'>Create shortcut (on desktop)
+3) On the desktop, RMB on the icon>Rename
+    Type 'Z-Anatomy'
 4) RMB Properties>Target
-    Add ' --app-template Z-Anatomy' (don't forget the first space)  
-5) Properties>Change icon>Browse  
+    Add ' --app-template Z-Anatomy' (don't forget the first space)
+5) Properties>Change icon>Browse
     Choose 'Z-Anatomy.ico'
 
-## HOW TO USE IT  
+## HOW TO USE IT
 
-This tutorial shows the shortcuts:  
-[![Z-Anatomy video](https://img.youtube.com/vi/JIxJnw1ARhs/0.jpg)](https://www.youtube.com/watch?v=JIxJnw1ARhs)  
+This tutorial shows the shortcuts:
+[![Z-Anatomy video](https://img.youtube.com/vi/JIxJnw1ARhs/0.jpg)](https://www.youtube.com/watch?v=JIxJnw1ARhs)
 
 
 ## LICENSE
