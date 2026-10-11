@@ -1,32 +1,53 @@
-"""Original vector schematics drawn from simple geometric primitives."""
-import re
+"""Bundled atlas meshes: identical anatomy in both synthetic comparison panels."""
+from functools import lru_cache
+from pathlib import Path
+import gzip
+import json
+import numpy as np
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
-PATHS = {
-    "Heart": 'M100 140 C20 95 40 35 75 55 Q100 20 125 55 C160 35 180 95 100 140Z',
-    "Lungs": 'M90 45 C45 25 25 110 45 135 Q75 150 90 110Z M110 45 C155 25 175 110 155 135 Q125 150 110 110Z',
-    "Kidneys": 'M75 40 C20 35 20 140 75 135 Q100 120 75 95 Q50 85 80 65Z M125 40 C180 35 180 140 125 135 Q100 120 125 95 Q150 85 120 65Z',
-    "Liver": 'M30 65 Q90 25 170 60 L150 100 Q110 100 85 135 L30 120Z',
-    "Whole body": 'M85 55 L115 55 L145 100 L130 110 L115 85 L115 120 L130 155 L110 160 L100 130 L90 160 L70 155 L85 120 L85 85 L70 110 L55 100Z',
-}
+ASSET_DIR = Path(__file__).resolve().parents[1] / 'assets' / 'anatomy'
+MODEL_KEYS = {'Heart':'heart', 'Lungs':'lungs', 'Kidneys':'kidneys', 'Liver':'liver', 'Whole body':'whole_body'}
+CAMERA = dict(eye=dict(x=0, y=-2.1, z=.35), up=dict(x=0,y=0,z=1), center=dict(x=0,y=0,z=0))
 
 
-def schematic(organ):
-    fig = go.Figure()
-    for offset, color, label in [(0, "#2DD4BF", "LOWER SIMULATION LABEL"), (220, "#FB923C", "HIGHER SIMULATION LABEL")]:
-        # Every pair in these original paths is an absolute x/y coordinate.
-        coordinates = iter(re.findall(r"-?\d+(?:\.\d+)?", PATHS[organ]))
-        axis = [0]
-        def translate(match):
-            value = float(next(coordinates)) + (offset if axis[0] % 2 == 0 else 25)
-            axis[0] += 1
-            return str(value)
-        path = re.sub(r"-?\d+(?:\.\d+)?", translate, PATHS[organ])
-        fig.add_shape(type="path", path=path, xref="x", yref="y", fillcolor=color, opacity=.65,
-                      line=dict(color=color, width=3))
-        if organ == "Whole body":
-            fig.add_shape(type="circle", x0=offset+85, x1=offset+115, y0=190, y1=220, fillcolor=color, line_color=color)
-        fig.add_annotation(x=offset+100, y=5, text=label, showarrow=False, font=dict(size=11, color=color))
-    fig.update_layout(height=260, margin=dict(l=0,r=0,t=0,b=0), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      xaxis=dict(range=[0,420], visible=False), yaxis=dict(range=[0,220], visible=False), showlegend=False)
+@lru_cache(maxsize=5)
+def load_model(organ):
+    """Load only local, reviewed assets; never accept paths or mesh data from CSVs."""
+    with gzip.open(ASSET_DIR / f'{MODEL_KEYS[organ]}.json.gz', 'rt') as source:
+        return json.load(source)
+
+
+@lru_cache(maxsize=10)
+def anatomy_figure(organ, comparison=True):
+    model = load_model(organ)
+    columns = 2 if comparison else 1
+    titles = ['Lower simulation label', 'Higher simulation label'] if comparison else [organ]
+    fig = make_subplots(rows=1, cols=columns, specs=[[{'type':'scene'}]*columns], subplot_titles=titles, horizontal_spacing=.04)
+    # One shared normalization preserves the relative positions of all atlas parts.
+    all_vertices = np.concatenate([np.asarray(part['vertices']) for part in model['parts']])
+    center = (all_vertices.max(axis=0) + all_vertices.min(axis=0))/2
+    scale = np.max(np.ptp(all_vertices, axis=0))/2
+    for column in range(1, columns+1):
+        for part in model['parts']:
+            vertices = ((np.asarray(part['vertices'])-center)/scale).astype(np.float32)
+            faces = np.asarray(part['faces'], dtype=np.int32)
+            fig.add_trace(go.Mesh3d(x=vertices[:,0], y=vertices[:,1], z=vertices[:,2],
+                i=faces[:,0], j=faces[:,1], k=faces[:,2],
+                color=part['color'], name=part['name'], opacity=part.get('opacity',1),
+                flatshading=False, lighting=dict(ambient=.45, diffuse=.85, specular=.25, roughness=.65, fresnel=.1),
+                lightposition=dict(x=-100,y=-200,z=300), hovertemplate=part['name']+'<extra></extra>', showlegend=False), row=1,col=column)
+    axis = dict(visible=False, showbackground=False)
+    for col in range(1, columns+1):
+        scene = 'scene' if col==1 else f'scene{col}'
+        fig.update_layout(**{scene:dict(xaxis=axis,yaxis=axis,zaxis=axis,aspectmode='data',camera=(dict(eye=dict(x=0,y=-3.8,z=.15),up=dict(x=0,y=0,z=1),center=dict(x=0,y=0,z=0)) if organ=='Whole body' else CAMERA),
+                                       dragmode='orbit',bgcolor='#102237')})
+    fig.update_layout(height=500 if comparison else 650, paper_bgcolor='#102237', plot_bgcolor='#102237',
+        margin=dict(l=5,r=5,t=45,b=5), font=dict(color='#E6EEF7'), uirevision=f'anatomy-{organ}',
+        meta=dict(organ=organ,identical_comparison=True,source='Z-Anatomy atlas'))
     return fig
+
+
+def fallback_path(organ):
+    return ASSET_DIR / f'{MODEL_KEYS[organ]}.png'

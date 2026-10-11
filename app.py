@@ -4,7 +4,7 @@ import plotly.express as px
 import streamlit as st
 from healthrisk.data import generate_data, filter_data, ORGANS, CATEGORIES, DISCLAIMER
 from healthrisk.analytics import insights, summary_report, organ_key
-from healthrisk.visuals import schematic
+from healthrisk.visuals import anatomy_figure, fallback_path
 from healthrisk.uploads import load_csv
 
 st.set_page_config(page_title="HealthRisk | Healthcare Analytics", page_icon="🫀", layout="wide")
@@ -74,11 +74,23 @@ def show_chart(fig):
     st.plotly_chart(fig, use_container_width=True)
 
 with explore:
+    st.subheader(f"{organ} · anatomical explorer")
+    static_models = st.toggle("Use static anatomical rendering (no WebGL)", value=False,
+        help="Choose this if your browser or device cannot display interactive 3D.")
+    if static_models:
+        lower, higher = st.columns(2)
+        for panel, label in [(lower, "Lower simulation label"), (higher, "Higher simulation label")]:
+            with panel:
+                st.markdown(f"**{label}**")
+                st.image(str(fallback_path(organ)), use_container_width=True)
+    else:
+        st.plotly_chart(anatomy_figure(organ), use_container_width=True, key=f"anatomy-{organ}",
+                        config={"scrollZoom": True, "displaylogo": False, "displayModeBar": True})
+    st.caption("Drag to rotate · scroll or pinch to zoom · use the camera reset in the toolbar. Each panel rotates independently. Both panels use identical atlas geometry and colors; simulation labels do not alter organ anatomy.")
+    st.caption("Atlas: Z-Anatomy / BodyParts3D. Kidney assets carry an upstream noncommercial attribution; see README and assets/anatomy/ATTRIBUTION.md for licenses. This reference anatomy does not represent selected patients or diagnoses.")
     left, right = st.columns([1, 1.2])
     with left:
         st.subheader(f"{organ} · simulation lens")
-        st.plotly_chart(schematic(organ), use_container_width=True, config={"displayModeBar": False})
-        st.caption("Original abstract schematic. Colors identify comparison groups; shape and color do not depict tissue damage or actual organ condition.")
         weights = ORGANS[organ]
         st.markdown("This lens emphasizes " + ", ".join(f"**{name} ({weight:.0%})**" for name, weight in weights.items()) + ". Weights are invented for learning, with no clinical validation.")
     with right:
