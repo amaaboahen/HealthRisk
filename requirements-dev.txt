@@ -1,3 +1,4 @@
 -r requirements.txt
 playwright==1.55.0
 fast-simplification==0.1.12
+cairosvg==2.8.2

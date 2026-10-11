@@ -7,7 +7,7 @@ import fast_simplification
 
 ROOT = Path(__file__).resolve().parents[1] / 'assets' / 'anatomy'
 cache = {}
-for key in ['heart','lungs','kidneys','liver','whole_body']:
+for key in ['heart','lungs','liver','whole_body']:
     path = ROOT / f'{key}.json.gz'
     with gzip.open(path,'rt') as f:
         model = json.load(f)

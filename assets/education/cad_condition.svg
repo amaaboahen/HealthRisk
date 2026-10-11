@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="460" viewBox="0 0 600 460">
+<defs><radialGradient id="tissue"><stop stop-color="#e5aaa0"/><stop offset="1" stop-color="#98554f"/></radialGradient>
+<radialGradient id="air"><stop stop-color="#eef0e9"/><stop offset="1" stop-color="#cdb0a8"/></radialGradient></defs>
+<rect width="600" height="460" rx="18" fill="#102237"/>
+<text x="300" y="38" text-anchor="middle" fill="#2dd4bf" font-family="sans-serif" font-size="23" font-weight="bold">Coronary artery disease</text>
+<g font-family="sans-serif"><circle cx="300" cy="220" r="140" fill="url(#tissue)" stroke="#e8b3a4" stroke-width="5"/><circle cx="300" cy="220" r="105" fill="#dbbd71"/><path d="M325 134 C410 145 390 280 318 302 C272 307 254 282 273 249 C299 213 264 166 325 134Z" fill="#712f3e" stroke="#ecb7a7" stroke-width="5"/><text x="300" y="390" text-anchor="middle" fill="#e6eef7" font-size="20">Plaque in wall → narrower lumen</text><text x="300" y="420" text-anchor="middle" fill="#e6eef7" font-size="20">Artery cross-section · illustrative plaque</text>
+<text x="300" y="448" text-anchor="middle" fill="#9fb3c8" font-size="12">Educational mechanism schematic · not to scale · no patient inference</text></g></svg>
