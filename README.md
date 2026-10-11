@@ -197,3 +197,39 @@ Development-only tools: `tools/export_anatomy.py` extracts source meshes with
 Blender, `tools/optimize_anatomy.py` reduces them, `tools/render_anatomy.py` renders
 reference fallbacks, and `tools/build_education.py` builds original mechanism
 illustrations. Normal startup does not execute these tools or download artwork.
+
+## Community Cloud import troubleshooting
+
+The documented deployment is Python 3.12, repository `amaaboahen/HealthRisk`,
+branch `main`, entrypoint `app.py`, with dependencies installed from the root
+`requirements.txt`. Do not deploy from an older branch or a different entrypoint.
+
+The dashboard imports reference rendering directly from
+`healthrisk/anatomy_views.py` and condition comparison rendering from
+`healthrisk/condition_views.py`. `healthrisk/visuals.py` remains a compatibility
+export for existing tests and tools. The two view implementations do not import
+each other; condition rendering depends only on the curated education module.
+The unused `fallback_path` import was removed from the entrypoint; the function
+remains available to rendering tools.
+
+Investigation found all four names in the merged source and successful startup
+from a clean runtime-only install. Loading the pre-condition `healthrisk.visuals`
+module into Python's module cache reproduces `cannot import name
+'condition_figure'`. A running deployment can then have a new `app.py` alongside
+an older imported module. The explicit modules avoid that dependency on the old
+visuals namespace. The supplied Cloud traceback identifies the same missing symbol in the local
+repository module on Python 3.12 immediately after “Updated app!”. Together
+with clean startup of the merged source, this strongly points to stale imported
+code during the live update. The Cloud interpreter cache was not directly inspected.
+
+After deploying a reviewed fix, use Community Cloud's **Reboot app** action to
+start a fresh interpreter. Confirm the branch, entrypoint, Python version, and
+installation logs. If the error remains, retain the complete traceback (including
+the missing name and module path); a line number alone cannot distinguish stale
+code from a missing dependency or an incorrect deployment branch.
+
+`tests/test_imports.py` imports the real `app.py` in a fresh subprocess, exercises
+startup with an old visuals namespace cached, checks public compatibility exports,
+and checks both view-module import orders. GitHub Actions installs only the runtime
+requirements on Python 3.12 and runs the full suite on pushes and PRs. This avoids
+relying on development-only CairoSVG or Playwright for app startup.

@@ -4,7 +4,8 @@ import plotly.express as px
 import streamlit as st
 from healthrisk.data import generate_data, filter_data, ORGANS, CATEGORIES, DISCLAIMER
 from healthrisk.analytics import insights, summary_report, organ_key
-from healthrisk.visuals import anatomy_figure, fallback_path, condition_figure, MODEL_KEYS
+from healthrisk.anatomy_views import anatomy_figure, MODEL_KEYS
+from healthrisk.condition_views import condition_figure
 from healthrisk.uploads import load_csv
 from healthrisk.education import CONDITIONS, condition_options, cohort_context, ASSETS
 
