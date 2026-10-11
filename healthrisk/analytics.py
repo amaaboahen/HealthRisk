@@ -24,7 +24,7 @@ def insights(df, organ):
     return result
 
 
-def summary_report(df, organ, source, filters):
+def summary_report(df, organ, source, filters, condition=None):
     key = organ_key(organ)
     counts = df[f"{key}_risk"].value_counts().reindex(CATEGORIES, fill_value=0)
     lines = ["# HealthRisk — Synthetic analytics report", "", DISCLAIMER, "", f"Source: {source}",
@@ -33,4 +33,12 @@ def summary_report(df, organ, source, filters):
     lines += ["", "## Rule-based descriptive insights"] + [f"- {s}" for s in insights(df, organ)]
     lines += ["", "## Numeric summary", df[["age", "smoking_duration", "bmi", "cholesterol", "systolic_bp", "diastolic_bp"]].describe().to_csv(),
               "", "Scores use clipped normalized inputs and arbitrary organ weights. Lower ≤35; Moderate >35–60; Higher >60. See README for full rules. These scores are not probabilities. No real patient data should be uploaded."]
+    if condition:
+        from .education import CONDITIONS, cohort_context
+        topic = CONDITIONS[condition]
+        lines += ["", "## Independently selected educational topic", condition,
+            "2D source-informed mechanism illustrations; not inferred organ damage, clinical prevalence, or a disease-specific 3D reconstruction.",
+            cohort_context(df,condition), "Visible differences: " + topic['visible'], "Potential effects: " + topic['function'],
+            "Risk factors / causes: " + topic['factors'], "Limitations: " + topic['limits']]
+        lines += [f"- {title}: {url}" for title,url in topic['sources']]
     return "\n".join(lines)

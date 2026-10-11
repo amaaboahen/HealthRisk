@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="460" viewBox="0 0 600 460">
+<defs><radialGradient id="tissue"><stop stop-color="#e5aaa0"/><stop offset="1" stop-color="#98554f"/></radialGradient>
+<radialGradient id="air"><stop stop-color="#eef0e9"/><stop offset="1" stop-color="#cdb0a8"/></radialGradient></defs>
+<rect width="600" height="460" rx="18" fill="#102237"/>
+<text x="300" y="38" text-anchor="middle" fill="#2dd4bf" font-family="sans-serif" font-size="23" font-weight="bold">Cirrhosis tissue pattern</text>
+<g font-family="sans-serif"><rect x="100" y="85" width="400" height="270" rx="40" fill="url(#tissue)"/><circle cx="173" cy="157" r="48" fill="#b77665" stroke="#ead1a6" stroke-width="12"/><circle cx="295" cy="163" r="54" fill="#b77665" stroke="#ead1a6" stroke-width="12"/><circle cx="416" cy="151" r="46" fill="#b77665" stroke="#ead1a6" stroke-width="12"/><circle cx="224" cy="274" r="53" fill="#b77665" stroke="#ead1a6" stroke-width="12"/><circle cx="373" cy="270" r="56" fill="#b77665" stroke="#ead1a6" stroke-width="12"/><path d="M100 225 Q270 220 310 85 M305 227 Q410 225 500 225 M305 228 L305 355" fill="none" stroke="#ead1a6" stroke-width="12"/><text x="300" y="390" text-anchor="middle" fill="#e6eef7" font-size="20">Fibrous bands separate regenerative nodules</text><text x="300" y="420" text-anchor="middle" fill="#e6eef7" font-size="20">Conceptual tissue architecture</text>
+<text x="300" y="448" text-anchor="middle" fill="#9fb3c8" font-size="12">Educational mechanism schematic · not to scale · no patient inference</text></g></svg>

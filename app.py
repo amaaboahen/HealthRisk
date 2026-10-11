@@ -4,8 +4,9 @@ import plotly.express as px
 import streamlit as st
 from healthrisk.data import generate_data, filter_data, ORGANS, CATEGORIES, DISCLAIMER
 from healthrisk.analytics import insights, summary_report, organ_key
-from healthrisk.visuals import anatomy_figure, fallback_path
+from healthrisk.visuals import anatomy_figure, fallback_path, condition_figure, MODEL_KEYS
 from healthrisk.uploads import load_csv
+from healthrisk.education import CONDITIONS, condition_options, cohort_context, ASSETS
 
 st.set_page_config(page_title="HealthRisk | Healthcare Analytics", page_icon="🫀", layout="wide")
 st.markdown('''<style>
@@ -74,20 +75,54 @@ def show_chart(fig):
     st.plotly_chart(fig, use_container_width=True)
 
 with explore:
-    st.subheader(f"{organ} · anatomical explorer")
-    static_models = st.toggle("Use static anatomical rendering (no WebGL)", value=False,
-        help="Choose this if your browser or device cannot display interactive 3D.")
+    st.subheader(f"{organ} · condition explorer")
+    condition = st.selectbox("Educational condition", condition_options(organ), key=f"condition-{organ}")
+    topic = CONDITIONS[condition]
+    st.info("Condition education is selected manually and is independent of the synthetic population. These illustrations do not diagnose disease or predict actual organ appearance.")
+    if organ == "Whole body":
+        st.markdown(f"**Whole-body context:** {condition} relates to the **{topic['organ'].lower()}**. The mechanism illustration below is a tissue-level inset, not a whole-body disease rendering. Explore its anatomical location in the reference atlas below.")
+    static_models = st.toggle("Use static educational illustrations (no interactive canvas)", value=False)
     if static_models:
-        lower, higher = st.columns(2)
-        for panel, label in [(lower, "Lower simulation label"), (higher, "Higher simulation label")]:
+        from healthrisk.education import illustration_path
+        reference, affected = st.columns(2)
+        for panel, damaged in [(reference,False),(affected,True)]:
             with panel:
-                st.markdown(f"**{label}**")
-                st.image(str(fallback_path(organ)), use_container_width=True)
+                st.markdown("**Selected condition · educational schematic**" if damaged else "**Healthy / reference structure**")
+                st.image(str(illustration_path(condition,damaged)), width="stretch")
     else:
-        st.plotly_chart(anatomy_figure(organ), use_container_width=True, key=f"anatomy-{organ}",
-                        config={"scrollZoom": True, "displaylogo": False, "displayModeBar": True})
-    st.caption("Drag to rotate · scroll or pinch to zoom · use the camera reset in the toolbar. Each panel rotates independently. Both panels use identical atlas geometry and colors; simulation labels do not alter organ anatomy.")
-    st.caption("Atlas: Z-Anatomy / BodyParts3D. Kidney assets carry an upstream noncommercial attribution; see README and assets/anatomy/ATTRIBUTION.md for licenses. This reference anatomy does not represent selected patients or diagnoses.")
+        st.plotly_chart(condition_figure(condition), use_container_width=True, key=f"education-{condition}-{organ}",
+            config={"scrollZoom":True,"displaylogo":False})
+    st.caption("Source-informed 2D educational schematics: drag to pan and scroll to zoom each panel independently. They are not realistic disease meshes, scans, or validated staging illustrations. Reliable, license-clear disease-specific 3D assets were not available for this release; no healthy mesh was deformed to invent pathology.")
+    explanation, context = st.columns([1.2,1])
+    with explanation:
+        st.markdown("#### Visible differences")
+        st.write(topic['visible'])
+        st.markdown("#### Potential effects on function")
+        st.write(topic['function'])
+        st.markdown("#### Established risk factors / causes")
+        st.write(topic['factors'])
+        st.caption(topic['limits'])
+        st.markdown("Sources: " + " · ".join(f"[{title}]({url})" for title,url in topic['sources']))
+    with context:
+        st.markdown("#### Selected synthetic population")
+        st.write(cohort_context(selected,condition))
+        st.caption("Published risk factors above are general education. The synthetic records contain no clinical condition labels or disease prevalence. Filters update the analytics, not the anatomy or chosen condition.")
+        if len(selected):
+            st.metric("Mean BMI",f"{selected.bmi.mean():.1f} kg/m²")
+            indicator = {"Heart":"cholesterol","Lungs":"smoking_duration","Kidneys":"systolic_bp","Liver":"cholesterol","Whole body":"systolic_bp"}[organ]
+            units = {"cholesterol":"mg/dL","smoking_duration":"years","systolic_bp":"mmHg","bmi":"kg/m²"}
+            st.metric("Cohort mean " + indicator.replace('_',' '),f"{selected[indicator].mean():.1f} {units[indicator]}")
+    with st.expander("3D reference anatomy & licensed source illustrations"):
+        if organ in MODEL_KEYS:
+            st.plotly_chart(anatomy_figure(organ,comparison=False),use_container_width=True,key=f"reference-{organ}",config={"scrollZoom":True,"displaylogo":False})
+            st.caption("Reference atlas only: drag to rotate, scroll to zoom, reset using the toolbar. This model depicts no disease and is unchanged by filters or condition selection. Z-Anatomy / BodyParts3D; CC BY-SA attribution in README.")
+        else:
+            st.image(str(ASSETS / "kidney_reference.jpg"),caption="Reference kidney anatomy — OpenStax Anatomy and Physiology 2e, historical CC BY 4.0 edition",width="stretch")
+            st.caption("The previous kidney mesh had uncertain noncommercial provenance and was replaced with this licensed reference illustration. No disease-specific kidney 3D model is claimed.")
+        if organ == "Whole body" and condition == "Advanced CKD-related changes":
+            st.image(str(ASSETS / "kidney_reference.jpg"),caption="Kidney reference anatomy — OpenStax, historical CC BY 4.0 edition; kidney meshes are excluded from the atlas.",width="stretch")
+        if condition == "Coronary artery disease":
+            st.image(str(ASSETS / "atherosclerosis_panel_a.jpg"),caption="OpenStax: normal artery vs plaque narrowing; panel (a) only. The separately credited micrograph was excluded.",width="stretch")
     left, right = st.columns([1, 1.2])
     with left:
         st.subheader(f"{organ} · simulation lens")
@@ -122,7 +157,7 @@ with explore:
     filters = f"age={ages}; smoking={statuses}; sex={sexes}; BMI={bmi}"
     c1, c2 = st.columns(2)
     c1.download_button("↓ Filtered synthetic records · CSV", selected.to_csv(index=False), "healthrisk_filtered.csv", "text/csv", use_container_width=True)
-    c2.download_button("↓ Summary report · Markdown", summary_report(selected, organ, source, filters), "healthrisk_report.md", "text/markdown", use_container_width=True)
+    c2.download_button("↓ Summary report · Markdown", summary_report(selected, organ, source, filters, condition=condition), "healthrisk_report.md", "text/markdown", use_container_width=True)
 
 with data_tab:
     st.subheader("Explore the records")

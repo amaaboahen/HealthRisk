@@ -15,7 +15,6 @@ bpy.ops.wm.open_mainfile(filepath=source)
 GROUPS = {
     'heart': ['Left atrium', 'Right atrium', 'Left ventricle', 'Right ventricle', 'Pulmonary trunk'],
     'lungs': ['Superior lobe of left lung', 'Inferior lobe of left lung', 'Superior lobe of right lung', 'Middle lobe of right lung', 'Inferior lobe of right lung', 'Trachea'],
-    'kidneys': ['Kidney.l', 'Kidney.r', 'Renal pelvis.l', 'Renal pelvis.r'],
     'liver': ['Liver'],
 }
 COLORS = {'heart':'#B85B62','lungs':'#CC9395','kidneys':'#A95F57','liver':'#985B4D'}

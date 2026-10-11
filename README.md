@@ -25,7 +25,7 @@ Streamlit reports its local address in the terminal. No API key, external servic
 
 Choose Whole body, Heart, Lungs, Kidneys, or Liver. Every view updates the score KPI, group distribution, smoking-group composition, age scatter, comparison box plot, and fixed-rule insights. Sidebar filters select age, sex, smoking status, and BMI. Empty selections give a helpful empty state. Download the filtered CSV or a Markdown report containing filters, counts, descriptive insights, and numeric statistics. The Data & methodology tab includes the dictionary, scoring rules, and complete sample download.
 
-The anatomical viewer uses the same realistic atlas meshes, naturalistic materials, and starting camera in both Lower and Higher panels. Drag to rotate, scroll/pinch to zoom, and reset the camera through the Plotly toolbar. Each panel moves independently. The models do **not** depict organ damage or patient-specific anatomy. Select **Use static anatomical rendering (no WebGL)** for the bundled high-resolution fallback images, rendered from those same meshes. Charts continue to show cohort summaries in either mode.
+Select an **Educational condition** independently of the data. Healthy/reference and condition panels show different, source-informed mechanism schematics: artery lumen narrowing, loss of alveolar septa, nephron loss/fibrosis, or fibrous liver bands and nodules. Drag to pan and scroll to zoom each 2D panel independently. Use **Use static educational illustrations (no interactive canvas)** for static images. The **3D reference anatomy & licensed source illustrations** expander provides rotatable/zoomable reference models for heart, lungs, liver, and whole-body anatomy, plus a licensed kidney reference illustration. No reference mesh is deformed into a disease model. The risk charts retain the separate Lower/Moderate/Higher simulation categories.
 
 ## Reproducible sample
 
@@ -82,76 +82,118 @@ Generation and scoring deliberately build relationships into the data, so compar
 - `.streamlit/config.toml`: theme and upload limit
 - `tests/`: dataset, validation, scoring, reporting, and Streamlit interaction tests
 - `data/synthetic_patients.csv`: reproducible sample
-- `assets/anatomy/`: compressed atlas meshes, static PNG fallbacks, and license notices
+- `assets/anatomy/`: compressed reference atlas meshes and license notices
+- `assets/education/`: condition diagrams, source illustrations, and historical CC BY license
 - `tools/`: optional offline mesh export, reduction, rendering, and Chromium smoke checks
 
 Dependencies are pinned in `requirements.txt`. Tests use Streamlit's AppTest and pytest. No changes are pushed automatically.
 
 
-## Anatomy assets and licenses
+## Educational comparisons: scope and medical limitations
 
-All five views use **Z-Anatomy — The libre 3D atlas of anatomy**, by Gauthier
-Kervyn, Marcin Zielinski, and contributors, derived in part from **BodyParts3D —
-The Database Center for Life Science**, original model by Kousaku Okubo.
+| Organ | Independently selected topic | Visible teaching difference |
+|---|---|---|
+| Heart | Coronary artery disease | Plaque within the arterial wall reduces lumen space; the outside of the heart may appear unchanged |
+| Lungs | Emphysema | Loss of alveolar septa produces enlarged, connected airspaces |
+| Kidneys | Advanced CKD-related changes | Conceptual loss of functioning nephron units and fibrosis; no universal kidney size or stage is inferred |
+| Liver | Cirrhosis | Fibrous bands and regenerative nodules disrupt tissue architecture |
+| Whole body | Any of the four topics | Selected tissue-level comparison plus a separate reference skeleton/organ atlas; no whole-body disease mesh |
+
+Reliable disease-specific 3D meshes with clear provenance were not available for
+this release. The app therefore uses the requested **illustration fallback**,
+clearly labeled **2D source-informed mechanism schematics**. These are not
+realistic reconstructed diseased organs, scans, quantitative pathology, or
+independently clinically reviewed/validated illustrations. They communicate
+standard medical mechanisms with deliberately simplified structures. See the
+condition explanations for functional effects, causes/risk factors, sources, and
+limitations. In particular, CKD has diverse causes and kidneys may be small,
+normal-sized, or enlarged; a “shrunken kidney” is not a universal representation.
+
+Population filters recalculate counts, mean scores, simulation-label shares,
+health indicators, insights, CSV exports, and reports. The education panel reports
+cohort context (age, BMI, smoking counts) without claiming condition prevalence.
+Condition choices and images are **not functions of smoking, sex, age, BMI, or
+simulated scores**. Sex filtering retains Female/Male/Other from the existing
+synthetic schema. Whole-body condition switching never changes the score formula.
+Reports include the selected educational topic in a separate, explicitly labeled
+section. No illustrations diagnose disease, estimate a clinical probability, or
+predict organ appearance.
+
+## Artwork sources and portfolio licensing
+
+**Original HealthRisk mechanism schematics** (SVG masters and 1200×920 PNGs):
+MIT-licensed artwork generated by `tools/build_education.py`. These illustrate
+medical facts; they are not copies of copyrighted source figures and do not deform
+anatomical meshes. Factual context comes from OpenStax Anatomy and Physiology 2e
+and the linked NHLBI/NIDDK educational resources. OpenStax modules were inspected;
+NIH pages were blocked by the build network and are linked as authoritative
+further reading. No claim of independent medical review is made.
+
+**Licensed kidney anatomy and artery illustration:** OpenStax / Rice University,
+Anatomy and Physiology 2e, historical commit
+`b0058a743bdd2cc08196abaaa7d5469970c0d80c` of
+https://github.com/openstax/osbooks-anatomy-physiology, explicitly licensed
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) in that edition.
+This edition predates the repository's 2026-03-19 noncommercial license change;
+its already-granted CC BY permissions are irrevocable when terms are followed.
+The kidney illustration is unmodified. Only panel (a) of the artery illustration
+is included; the separately credited University of Michigan micrograph is excluded.
+Full attribution, changes, and the historical license are retained in
+[assets/education/ATTRIBUTION.md](assets/education/ATTRIBUTION.md).
+
+**3D reference atlas:** Z-Anatomy — The libre 3D atlas of anatomy, by Gauthier
+Kervyn, Marcin Zielinski, and contributors, derived in part from BodyParts3D —
+The Database Center for Life Science, original model by Kousaku Okubo.
 Source: https://github.com/Z-Anatomy/Models-of-human-anatomy at commit
-`9de5d6912a1b0df9cab739d57f00e036b0496ddc`, `Z-Anatomy.zip/Startup.blend`.
-
-The atlas declares [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/);
-the original BodyParts3D attribution is
+`9de5d6912a1b0df9cab739d57f00e036b0496ddc`.
+Atlas [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/);
+original BodyParts3D attribution
 [CC BY-SA 2.1 Japan](https://creativecommons.org/licenses/by-sa/2.1/jp/).
-The upstream atlas additionally credits **Kidney — Lissie Cowley —
-[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)** without
-per-object provenance. We preserve that attribution and conservatively restrict
-the kidney assets (including their inclusion in the whole-body view and rendered
-PNGs) to noncommercial use. This educational application must not be treated as
-commercially cleared anatomy artwork. Obtain provenance clarification or replace
-the kidney meshes before commercial deployment.
+Keep attribution/share-alike terms for redistributed atlas derivatives; these
+assets are not covered by the application's MIT license. They depict reference
+surfaces, not condition-specific pathology.
 
-Assets and their rendered derivatives retain the applicable Creative Commons
-terms; the repository's MIT license applies to application code, not these
-third-party assets. Full source notices, included structures, modifications, and
-licensing details are in [assets/anatomy/ATTRIBUTION.md](assets/anatomy/ATTRIBUTION.md).
-Heart includes atria, ventricles and pulmonary trunk; lungs include all five lobes
-and trachea; kidneys include paired kidneys and renal pelves; liver is its outer
-surface; the whole-body view places these organs inside a reference skeleton.
-Fine surface detail is reduced for performance. These are atlas-based surface
-representations, not a complete dissection, validated clinical imaging, or an
-anatomical model of any selected synthetic record. Anatomy accuracy is limited
-by the source atlas and mesh simplification. Scores never change geometry or color.
+The previous kidney mesh with uncertain noncommercial reference provenance was
+**removed**, including the kidney parts of the whole-body asset and the kidney
+render. The whole-body view now includes skeleton, heart, lungs, and liver; its
+missing kidneys are available in the separately licensed 2D reference. The original
+upstream notices are retained for provenance, including references not used in
+this release. See [assets/anatomy/ATTRIBUTION.md](assets/anatomy/ATTRIBUTION.md).
+There are no imported noncommercial kidney assets in this release.
 
 ## Streamlit Community Cloud
 
-Deploy `app.py` from this repository on Python 3.12. `requirements.txt` contains
-all runtime dependencies. All meshes and PNGs are bundled; the viewer makes no
-external model/CDN request, uses Streamlit's built-in Plotly renderer, and requires
-no Blender, API keys, custom component server, or native runtime libraries.
-Make sure `assets/anatomy/` is included in the deployment. WebGL is a browser
-capability; the static toggle supports devices that cannot run it. A model is
-cached locally by organ, and compact typed arrays reduce payload overhead.
-Live Community Cloud deployment has not been performed as part of this change.
+Deploy `app.py` on Python 3.12 with `requirements.txt`. All models, diagrams, and
+source illustrations are local repository files. The viewer uses Streamlit's
+built-in Plotly renderer, not a custom component or external CDN. No API key,
+Blender, CairoSVG, or native image converter is required at runtime. Static image
+mode handles devices without an interactive canvas. PNGs are prepared in advance;
+SVG generation and browser checks use development dependencies only.
 
-### Additional development validation
+Include `assets/anatomy/` and `assets/education/` in the deployment. Cached figures
+and compact typed arrays reduce rerender overhead. Runtime/import compatibility
+and server startup were checked locally; **a live Community Cloud deployment has
+not been performed**.
 
-The core suite includes all original dashboard tests plus local asset integrity,
-identical comparison geometry/materials, all organ views, and static fallbacks:
+## Additional development validation
 
 ```bash
 .venv/bin/python -m pytest -q
-```
-
-For real-browser mouse rotation/zoom, rendered WebGL scenes, a valid upload,
-CSV/report downloads, fallback images, and a narrow viewport:
-
-```bash
 .venv/bin/python -m pip install -r requirements-dev.txt
-# Requires Chromium installed locally; CHROMIUM_PATH can override its location.
+# Chromium required; CHROMIUM_PATH can override its location.
 .venv/bin/python -m streamlit run app.py --server.headless=true --server.port=8502
-# In a separate terminal:
+# Separate terminal:
 .venv/bin/python -m tools.browser_smoke --url http://127.0.0.1:8502
 ```
 
-Development-only `playwright` and `fast-simplification` are kept out of runtime
-requirements. `tools/export_anatomy.py` can extract the pinned source archive with
-Blender; `tools/optimize_anatomy.py` reduces triangle counts, and
-`tools/render_anatomy.py` regenerates the bundled static fallbacks. Normal app
-startup does not run any of these tools or download assets.
+The suite covers original generation/upload/report behavior, reference mesh
+integrity, removal of restricted kidney assets, different condition illustrations,
+independent axes, all five organ comparisons, all smoking/sex/age/BMI filters,
+cohort context, condition independence, static fallback, and education exports.
+Browser checks exercise pan/zoom of all comparisons, rotation/zoom of available
+reference models, condition switching, fallback, uploads, and actual downloads.
+
+Development-only tools: `tools/export_anatomy.py` extracts source meshes with
+Blender, `tools/optimize_anatomy.py` reduces them, `tools/render_anatomy.py` renders
+reference fallbacks, and `tools/build_education.py` builds original mechanism
+illustrations. Normal startup does not execute these tools or download artwork.

@@ -48,9 +48,9 @@ def test_static_fallback_all_organs_and_analytics():
     for organ in ['Heart','Lungs','Kidneys','Liver','Whole body']:
         app.radio[0].set_value(organ).run(timeout=30)
         assert not app.exception
-        assert len(app.get('imgs')) == 2
+        assert len(app.get('imgs')) >= 2
         assert app.metric[0].value == '2,500'
-        assert len(app.get('plotly_chart')) == 4
+        assert len(app.get('plotly_chart')) == (4 if organ == 'Kidneys' else 5)
     app.toggle[0].set_value(False).run(timeout=30)
     assert not app.exception
-    assert len(app.get('plotly_chart')) == 5
+    assert len(app.get('plotly_chart')) == 6

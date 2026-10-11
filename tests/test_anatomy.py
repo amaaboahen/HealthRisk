@@ -25,6 +25,7 @@ def test_local_mesh_integrity_and_identical_comparisons(organ):
     assert fig.layout.scene.dragmode == fig.layout.scene2.dragmode == 'orbit'
     assert fig.layout.scene.camera == fig.layout.scene2.camera
     assert fig.layout.uirevision == f'anatomy-{organ}'
+    assert all(not part['name'].startswith(('Kidney.','Renal pelvis.')) for part in model['parts'])
     assert fallback_path(organ).read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
 
 
